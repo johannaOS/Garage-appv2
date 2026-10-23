@@ -35,11 +35,11 @@ namespace Garage_App
 
     public class Main : Menu
     {
-        public Garage? ExecuteCreateNewGarageSelection()
+        public Garage CreateNewGarage()
         {
             //Get garage name
             Console.WriteLine("(Tryck 9 för att komma tillbaka till huvudmenyn)\nNamnge ditt garage:");
-            string? name = Console.ReadLine().Trim().Replace("  ", " ");
+            string? name = (Console.ReadLine() ?? "").Trim().Replace("  ", " ");
             while (String.IsNullOrEmpty(name)) {
                 Console.WriteLine("Garaget måste ha ett namn!");
                 name = Console.ReadLine();
@@ -53,7 +53,7 @@ namespace Garage_App
                     Console.WriteLine("Du måste ange ett giltigt antal!");
                 //Confirm amount of spaces
                 Console.WriteLine($"Du har angivit {parkingSpaces} parkeringsplatser. Stämmer det? (y/n)");
-                string? confirmationResponse = Console.ReadLine().Trim();
+                string? confirmationResponse = (Console.ReadLine() ?? "").Trim();
                 if (confirmationResponse == "n")
                 {
                     Console.WriteLine($"Ange hur många parkeringsplatser som finns i {name}");
@@ -63,7 +63,8 @@ namespace Garage_App
                 //Go ahead with creating a garage object
                 return new Garage(name, parkingSpaces);
             }
-            else return null;
+            else
+                throw new ArgumentException("Uknown error in CreateNewGarage");
 
         }
     }

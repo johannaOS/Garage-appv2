@@ -8,13 +8,12 @@ namespace Garage_App
     {
         public int Id { get; }
         public int Spaces { get; }
-        private Vehicle[] CheckedInVehicles { get; }
+        private List<Vehicle> CheckedInVehicles = new List<Vehicle>();
         public string? Name { get; set; }
         public Garage(string? name, int spaces)
         {
             Spaces = spaces;
             Name = name;
-            CheckedInVehicles = new Vehicle[spaces];
             Console.WriteLine("-------------------------------------------------------------------------------");
             Console.WriteLine($"| Du har skapat ett garage med namn \"{Name}\" som innehåller {Spaces} parkeringsplatser. |");
             Console.WriteLine("-------------------------------------------------------------------------------\n");
@@ -22,7 +21,7 @@ namespace Garage_App
 
         public int GetAvailableSpaces(bool print = true)
         {
-            int occupiedSpaces = CheckedInVehicles.Count(v => v != null);
+            int occupiedSpaces = CheckedInVehicles.Count;
             if (print)
                 Console.WriteLine($"Det finns {Spaces - occupiedSpaces} av {Spaces} lediga parkeringsplatser. ");
             return Spaces - occupiedSpaces;
@@ -36,10 +35,9 @@ namespace Garage_App
             int index = -1;
             if (!SearchByRegNr(vehicle.RegNr, ref index)) //fordonet finns inte i garaget
             {
-                int index2 = Array.IndexOf(CheckedInVehicles, null);
-                CheckedInVehicles[index2] = vehicle;
+                CheckedInVehicles.Add(vehicle);
                 Console.WriteLine("-------------------------------------------------------------");
-                Console.WriteLine($"| Din {vehicle.Type} är incheckad på parkeringsplats {index2}. |");
+                Console.WriteLine($"| Din {vehicle.Type} är incheckad på parkeringsplats {CheckedInVehicles.IndexOf(vehicle)}. |");
                 Console.WriteLine("-------------------------------------------------------------\n");
             }
             else
@@ -52,20 +50,21 @@ namespace Garage_App
                 throw new ArgumentException($"Garaget {Name} är tomt!");
             //Get vehicle registration No.
             Console.WriteLine("Ange registreringsnumret på fordonet du vill checka ut:");
-            string? regNo = Console.ReadLine().Trim().ToUpper().Replace(" ", "");
+            string? regNo = (Console.ReadLine() ?? "").Trim().ToUpper().Replace(" ", "");
             while (String.IsNullOrEmpty(regNo))
             {
                 Console.WriteLine("Ange ett giltigt registreringsnummer!");
-                regNo = Console.ReadLine().Trim().ToUpper().Replace(" ", "");
+                regNo = (Console.ReadLine() ?? "").Trim().ToUpper().Replace(" ", "");
             }
             //Checka ut fordonet
             int matchIndex = -1;
+
             if (SearchByRegNr(regNo, ref matchIndex))
             {
                 Console.WriteLine("-----------------------------------------------------------------");
                 Console.WriteLine($"| Din {CheckedInVehicles[matchIndex].Type} med regNr {CheckedInVehicles[matchIndex].RegNr} har blivit utcheckat från {Name} |");
                 Console.WriteLine("-----------------------------------------------------------------\n");
-                CheckedInVehicles[matchIndex] = null;
+                CheckedInVehicles.RemoveAt(matchIndex);
             }
             else
             {
@@ -78,17 +77,14 @@ namespace Garage_App
             regNr = regNr.ToUpper();
             //Search for vehicle in garage
             bool match = false;
-            for (int i = 0; i < Spaces; i++)
+            for (int i = 0; i < CheckedInVehicles.Count; i++)
             {
-                if (CheckedInVehicles[i] is not null)
-                {
                     if (regNr == CheckedInVehicles[i].RegNr)
                     {
                         index = i;
                         match = true;
                         return match;
                     }
-                }
             }
             return match;
         }
@@ -97,7 +93,6 @@ namespace Garage_App
             GetAvailableSpaces();
             int[] countVehicleTypes = new int[5];
             foreach (var vehicle in CheckedInVehicles) {
-                if (vehicle is not null) {
                     switch (vehicle.Type)
                     {
                         case "Motorcykel":
@@ -119,52 +114,40 @@ namespace Garage_App
                             break;
 
                     }
-                }
             }
             Console.WriteLine($"{Name} innehåller:\nMotorcyklar: {countVehicleTypes[0]}\nFlygplan: {countVehicleTypes[1]}\nBilar: {countVehicleTypes[2]}\nBussar: {countVehicleTypes[3]}\nBåtar: {countVehicleTypes[4]}\n");
 
 
         }
 
-        public Vehicle[] SearchInRegNr(string _regNr)
+        public List<Vehicle> SearchInRegNr(string _regNr)
         {
-            if (CheckedInVehicles.Count(v => v != null) == 0)
+            if (CheckedInVehicles.Count == 0)
                 throw new ArgumentException($"Det finns inga fordon i {Name}");
             // Kolla matchning
-            var ResultList = new Vehicle[Spaces - GetAvailableSpaces(false)]; //largest possible array
-            int index = 0;
+            var ResultList = new List<Vehicle>();
             foreach (Vehicle v in CheckedInVehicles)
             {
-                if (v is not null){
                     if (v.RegNr.Contains(_regNr))
-                    {
-                        ResultList[index] = v;
-                        index++;
-                    }
-                }
+                        ResultList.Add(v);
             }
-            return ResultList[0..index];
+            return ResultList;
         }
-        public Vehicle[] SearchColor(string userInput)
+
+        //Replace with list
+        public List<Vehicle> SearchColor(string userInput)
         {
-            if (CheckedInVehicles.Count(v => v != null) == 0)
+            if (CheckedInVehicles.Count == 0)
                 throw new ArgumentException($"Det finns inga fordon i {Name}");
-            
+
             // Kolla matchning
-            var ResultList = new Vehicle[Spaces - GetAvailableSpaces(false)]; //largest possible array
-            int index = 0;
+            var ResultList = new List<Vehicle>();
             foreach (Vehicle v in CheckedInVehicles)
             {
-                if (v is not null)
-                {
                     if (v.Color.Contains(userInput))
-                    {
-                        ResultList[index] = v;
-                        index++;
-                    }
-                }
+                        ResultList.Add(v);
             }
-            return ResultList[0..index];
+            return ResultList;
         }
 
     }

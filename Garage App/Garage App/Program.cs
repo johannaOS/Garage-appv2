@@ -24,39 +24,43 @@ while (programOn)
             programOn = false; break;
         case "1":
             { // the braces create a block scope, meaning the newGarage instance will only excist here
-                Garage? newGarage = MainMenu.ExecuteCreateNewGarageSelection();
-                if (newGarage != null)
+                try { 
+                    Garage newGarage = MainMenu.CreateNewGarage();
                     myGarages.Add(newGarage);
-                Console.WriteLine("Vill du populera garaget direkt? (y/n)");
-                string userResponse = Console.ReadLine().Trim().ToLower();
-                while (userResponse != "y" && userResponse != "n")
-                {
-                    Console.WriteLine("Du måste ange 'y' eller 'n'!");
-                    userResponse = Console.ReadLine().Trim().ToLower();
-                }
-                if (userResponse == "n")
-                    break;
-                else
-                {
-                    Console.WriteLine($"Hur många fordon vill du populera garaget med? Max: {newGarage.Spaces}!");
-                    int initPop;
-                    while (!int.TryParse(Console.ReadLine().Trim(), out initPop) || initPop <= 0 || initPop > newGarage.Spaces)
-                        Console.WriteLine("Du måste ange ett giltigt antal!");
-                    if (newGarage != null)
+                    Console.WriteLine("Vill du populera garaget direkt? (y/n)");
+                    string userResponse = (Console.ReadLine() ?? "").Trim().ToLower();
+                    while (userResponse != "y" && userResponse != "n")
                     {
-                        int count = 0;
-                        while (count < initPop)
-                        {
-                            try
-                            {if (CheckIn(newGarage))
-                                    count++;
-                            }
-                            catch (Exception ex) { Console.WriteLine(ex.Message); }
-                        }
+                        Console.WriteLine("Du måste ange 'y' eller 'n'!");
+                        userResponse = (Console.ReadLine() ?? "").Trim().ToLower();
                     }
-                    Console.WriteLine("Då har du populerat klart ditt garage!\n");
+                    if (userResponse == "n")
+                        break;
+                    else
+                    {
+                        Console.WriteLine($"Hur många fordon vill du populera garaget med? Max: {newGarage.Spaces}!");
+                        int initPop;
+                        while (!int.TryParse((Console.ReadLine() ?? "").Trim(), out initPop) || initPop <= 0 || initPop > newGarage.Spaces)
+                            Console.WriteLine("Du måste ange ett giltigt antal!");
+                        if (newGarage != null)
+                        {
+                            int count = 0;
+                            while (count < initPop)
+                            {
+                                try
+                                {
+                                    if (CheckIn(newGarage))
+                                        count++;
+                                }
+                                catch (Exception ex) { Console.WriteLine(ex.Message); }
+                            }
+                        }
+                        Console.WriteLine("Då har du populerat klart ditt garage!\n");
+                    }
+                    break;
                 }
-                break;
+                catch (Exception ex) { Console.WriteLine(ex.Message); break; }
+                
             }
 
         case "2":
@@ -188,7 +192,7 @@ static void RunSearchInVehiclesMenu(Garage selectedGarage)
         MenuOptions = new List<string> { "0: Gå tillbaka\t", "1: Registreringsnummer\t", "2: Färg\t", "3: Parkeringsrutor\t", "4: Drivmedel\t", "9: Rensa sökfras\n" }
     };
 
-    var searchResult = new Vehicle[selectedGarage.Spaces - selectedGarage.GetAvailableSpaces()];
+    var searchResult = new List<Vehicle>();
     bool MenuOn = true;
     string searchPhrase = "";
     while (MenuOn)
@@ -205,7 +209,7 @@ static void RunSearchInVehiclesMenu(Garage selectedGarage)
                 // T ex alla registreringsnummer som innehåller "f"
                 Console.Write("Skriv din sökfras: ");
                 string searchRegNr = GetRegNr();
-                var searchRegResult = selectedGarage.SearchInRegNr(searchRegNr);
+                List<Vehicle> searchRegResult = selectedGarage.SearchInRegNr(searchRegNr);
                 AddToSearchResult(searchResult, searchRegResult);
                 searchPhrase += " + " + searchRegNr;
                 Console.WriteLine($"Resultatet visar sök på: {searchPhrase}");
@@ -228,6 +232,7 @@ static void RunSearchInVehiclesMenu(Garage selectedGarage)
                 break;
             case "9":
                 searchPhrase = "";
+                searchResult.Clear();
                 break;
             default:
                 Console.WriteLine("Ange ett giltigt alternativ!");
@@ -244,7 +249,7 @@ static bool CheckIn(Garage garage)
         string userChoice;
         while (true)
         {
-            userChoice = Console.ReadLine().Trim();
+            userChoice = (Console.ReadLine() ?? "").Trim();
             if (userChoice == "0")
                 return false;
             else if (new string[] {"1", "2", "3", "4", "5"}.Contains(userChoice))
@@ -412,11 +417,11 @@ static string ValidateRegNr(Garage garage)
 }
 static string GetRegNr()
 {
-    string _regNr = Console.ReadLine().Trim().Replace(" ", "").ToUpper();
+    string _regNr = (Console.ReadLine() ?? "").Trim().Replace(" ", "").ToUpper();
     while (String.IsNullOrEmpty(_regNr) || _regNr.Length > 12)
     {
         Console.WriteLine("Du måste ange ett giltigt registreringsnummer!");
-        _regNr = Console.ReadLine().Trim().Replace(" ", "").ToUpper();
+        _regNr = (Console.ReadLine() ?? "").Trim().Replace(" ", "").ToUpper();
     }
     return _regNr;
 }
@@ -426,7 +431,7 @@ static string ValidateColor()
     Console.Write("Ange färg (obligatoriskt): ");
     while (true)
     {
-        string color = Console.ReadLine().Trim().Replace(" ", "").ToLower();
+        string color = (Console.ReadLine() ?? "").Trim().Replace(" ", "").ToLower();
         try
         {
             if (String.IsNullOrEmpty(color) || color.Length > 200)
@@ -442,7 +447,7 @@ static int? ValidateNrOfWheels()
     int nrOfwheels;
     while (true)
     {
-        string wheels = Console.ReadLine().Trim().Replace(" ", "");
+        string wheels = (Console.ReadLine() ?? "").Trim().Replace(" ", "");
         if (wheels == "0")
             return null;
         if (int.TryParse(wheels, out nrOfwheels) && nrOfwheels > 1 && nrOfwheels < 11)
@@ -457,49 +462,42 @@ static double ValidateLength()
     double length;
     while (true)
     {
-        string input = Console.ReadLine().Trim().Replace(" ", "");
+        string input = (Console.ReadLine() ?? "").Trim().Replace(" ", "");
         if (double.TryParse(input, out length) && length > 1 && length <100 )
             return length;
         else
             Console.WriteLine("Du måste ange en giltig längd!");
     }
 }
-static void AddToSearchResult(Vehicle[] oldSearchResult, Vehicle[] newSearchResult)
+
+static void AddToSearchResult(List<Vehicle> oldSearchResult, List<Vehicle> newSearchResult)
 {
-    if (newSearchResult.Length == 0)
-    {
+    if (newSearchResult.Count == 0)
         Console.WriteLine("Din sökning gav ingen match!\n");
-    }
     else
     {
         bool duplicate = false;
-        if (oldSearchResult.Count(v => v != null) > 0) //kolla om searchResult har Vehicles i sig
+        if (oldSearchResult.Count > 0) //kolla om searchResult har Vehicles i sig
         {
             foreach (var v in newSearchResult)
             {
                 duplicate = false; //reset if true
                 foreach(var v2 in oldSearchResult)
                 {
-                    if (v2 is not null)
-                    {
                         if (v.RegNr == v2.RegNr) //Check if vehicle isn't already there
                             duplicate = true;
-                    }
                 }
                 if (duplicate == false)
-                    oldSearchResult[Array.IndexOf(oldSearchResult, null)] = v; //put vehicle in first empty place
+                    oldSearchResult.Add(v);
             }
         }
-        else //SearchResult är tom
-        {
-            foreach (var v in newSearchResult)
-                oldSearchResult[Array.IndexOf(oldSearchResult, null)] = v; //put vehicle in first empty place
-        }
+        else //oldSearchResult är tom
+            oldSearchResult.AddRange(newSearchResult);
+        
         Console.WriteLine("Dina matchningar:");
         foreach (var v in oldSearchResult)
         {
-            if (v is not null)
-                Console.WriteLine(v.Type + ": " + v.RegNr);
+            Console.WriteLine(v.Type + ": " + v.RegNr);
         }
         Console.WriteLine();
     }
@@ -509,11 +507,11 @@ static string GetSearchPhrase()
 {
     //Hämta sökfras
     Console.Write("Ange din sökfras: ");
-    string userInput = Console.ReadLine().Trim().ToLower().Replace(" ", "");
+    string userInput = (Console.ReadLine() ?? "").Trim().ToLower().Replace(" ", "");
     while (String.IsNullOrEmpty(userInput))
     {
         Console.WriteLine("Ange giltig sökfras!");
-        userInput = Console.ReadLine().Trim().ToLower().Replace(" ", "");
+        userInput = (Console.ReadLine() ?? "").Trim().ToLower().Replace(" ", "");
     }
     return userInput;
 }
