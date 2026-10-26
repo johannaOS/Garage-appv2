@@ -1,4 +1,4 @@
-Garage app version 1 med arrayer.
+Garage app version 2 med listor.
 Finns implementerat:
 Nivå 1: Huvudmeny
    - Skapa ett nytt garage (inkl populera det direkt)
@@ -12,3 +12,12 @@ Nivå 3: Sök bland fordon (i ett garage)
    - Sök efter registreringsnummer
    - Övrigt sök
 Nivå 4: Övrigt sök (sök bland egenskaper i Vehicle-klassen)
+
+Klasser som används:
+- Meny-klass för olika menyer
+- Vehicle: abstrakt klass
+- Fordonsklasserna båt, flygplan, bil, motorcykel, buss
+
+Saker som kan förbättras:
+- Använda RegEx
+- Sökfunktionen kan vara tydligare
