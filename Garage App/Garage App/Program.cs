@@ -51,6 +51,8 @@ while (programOn)
                                 {
                                     if (CheckIn(newGarage))
                                         count++;
+                                    else
+                                        break;
                                 }
                                 catch (Exception ex) { Console.WriteLine(ex.Message); }
                             }
@@ -194,6 +196,7 @@ static void RunSearchInVehiclesMenu(Garage selectedGarage)
 
     var searchResult = new List<Vehicle>();
     bool MenuOn = true;
+    //var searches = new Dictionary<string, string>();//key = property, value = sökfras
     string searchPhrase = "";
     while (MenuOn)
     {
