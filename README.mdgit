@@ -21,3 +21,21 @@ Klasser som används:
 Saker som kan förbättras:
 - Använda RegEx
 - Sökfunktionen kan vara tydligare
+
+Bugg:
+Vill du populera garaget direkt? (y/n)
+y
+Hur många fordon vill du populera garaget med? Max: 1!
+1
+Det finns 1 av 1 lediga parkeringsplatser.
+Vilket typ av fordon vill du checka in?
+1: Motorcykel   2: Flygplan     3: Bil  4: Buss 5: Båt  0: Avbryt
+1
+Ange registreringsnummer (obligatoriskt): 0
+Ange färg (obligatoriskt): 0
+Ange antal hjul (tryck 0 för att hoppa över denna): 0
+-------------------------------------------------------------
+| Din Motorcykel är incheckad på parkeringsplats 0. |
+-------------------------------------------------------------
+
+Då har du populerat klart ditt garage!
