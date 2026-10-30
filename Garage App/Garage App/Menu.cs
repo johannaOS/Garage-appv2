@@ -57,7 +57,7 @@ namespace Garage_App
                 if (confirmationResponse == "n")
                 {
                     Console.WriteLine($"Ange hur många parkeringsplatser som finns i {name}");
-                    while (!int.TryParse(Console.ReadLine(), out parkingSpaces))
+                    while (!int.TryParse(Console.ReadLine(), out parkingSpaces) || parkingSpaces <= 0)
                         Console.WriteLine("Du måste ange ett giltigt antal!");
                 }
                 //Go ahead with creating a garage object

@@ -134,7 +134,6 @@ namespace Garage_App
             return ResultList;
         }
 
-        //Replace with list
         public List<Vehicle> SearchColor(string userInput)
         {
             if (CheckedInVehicles.Count == 0)
@@ -149,6 +148,7 @@ namespace Garage_App
             }
             return ResultList;
         }
+       
 
     }
 }

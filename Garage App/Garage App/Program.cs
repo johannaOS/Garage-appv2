@@ -27,38 +27,7 @@ while (programOn)
                 try { 
                     Garage newGarage = MainMenu.CreateNewGarage();
                     myGarages.Add(newGarage);
-                    Console.WriteLine("Vill du populera garaget direkt? (y/n)");
-                    string userResponse = (Console.ReadLine() ?? "").Trim().ToLower();
-                    while (userResponse != "y" && userResponse != "n")
-                    {
-                        Console.WriteLine("Du måste ange 'y' eller 'n'!");
-                        userResponse = (Console.ReadLine() ?? "").Trim().ToLower();
-                    }
-                    if (userResponse == "n")
-                        break;
-                    else
-                    {
-                        Console.WriteLine($"Hur många fordon vill du populera garaget med? Max: {newGarage.Spaces}!");
-                        int initPop;
-                        while (!int.TryParse((Console.ReadLine() ?? "").Trim(), out initPop) || initPop <= 0 || initPop > newGarage.Spaces)
-                            Console.WriteLine("Du måste ange ett giltigt antal!");
-                        if (newGarage != null)
-                        {
-                            int count = 0;
-                            while (count < initPop)
-                            {
-                                try
-                                {
-                                    if (CheckIn(newGarage))
-                                        count++;
-                                    else
-                                        break;
-                                }
-                                catch (Exception ex) { Console.WriteLine(ex.Message); }
-                            }
-                        }
-                        Console.WriteLine("Då har du populerat klart ditt garage!\n");
-                    }
+                    Populate(newGarage);
                     break;
                 }
                 catch (Exception ex) { Console.WriteLine(ex.Message); break; }
@@ -126,7 +95,8 @@ static void RunGarageMenu(Garage selectedGarage)
                 catch (Exception ex) { Console.WriteLine(ex.Message); }
                 break;
             case "2":
-                selectedGarage.CheckOut();
+                try { selectedGarage.CheckOut(); }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
                 break;
             case "3":
                 selectedGarage.ListParkedVehicles();
@@ -518,5 +488,46 @@ static string GetSearchPhrase()
     }
     return userInput;
 }
+static bool Populate(Garage newGarage)
+{
+    Console.WriteLine("Vill du populera garaget direkt? (y/n)");
+    string userResponse = (Console.ReadLine() ?? "").Trim().ToLower();
+    while (userResponse != "y" && userResponse != "n")
+    {
+        Console.WriteLine("Du måste ange 'y' eller 'n'!");
+        userResponse = (Console.ReadLine() ?? "").Trim().ToLower();
+    }
+    if (userResponse == "n")
+        return false;
+    else
+    {
+        Console.WriteLine($"Hur många fordon vill du populera garaget med? Max: {newGarage.Spaces}!");
+        int initPop;
+        while (!int.TryParse((Console.ReadLine() ?? "").Trim(), out initPop) || initPop <= 0 || initPop > newGarage.Spaces)
+            Console.WriteLine("Du måste ange ett giltigt antal!");
+        if (newGarage != null)
+        {
+            int count = 0;
+            while (count < initPop)
+            {
+                try
+                {
+                    if (CheckIn(newGarage))
+                        count++;
+                    else
+                        break;
+                }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
+            }
+        }
+        Console.WriteLine("Då har du populerat klart ditt garage!\n");
+        return true;
+    }
+}
+/*Tänk så här:
+• Huvudprogrammet eller UI-lagret ansvarar för `input()` och `print()`.
+• Klasser och deras metoder ansvarar för data och beteende.
+• Metoderna får den information de behöver som argument.
+• Metoderna returnerar resultat eller ändrar objektets tillstånd.*/
 
 
